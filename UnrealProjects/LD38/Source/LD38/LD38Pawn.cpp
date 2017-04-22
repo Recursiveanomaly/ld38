@@ -38,7 +38,7 @@ ALD38Pawn::ALD38Pawn()
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
 	MaxSpeed = 4000.f;
-	MinSpeed = 0.0f;
+	MinSpeed = -125.0f;
 	CurrentForwardSpeed = 500.f;
 }
 
@@ -51,8 +51,8 @@ void ALD38Pawn::Tick(float DeltaSeconds)
 
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0,0,0);
-	DeltaRotation.Pitch = CurrentPitchSpeed * DeltaSeconds;
-	//DeltaRotation.Yaw = CurrentYawSpeed * DeltaSeconds;
+	//DeltaRotation.Pitch = CurrentPitchSpeed * DeltaSeconds;
+	DeltaRotation.Yaw = CurrentYawSpeed * DeltaSeconds;
 	//DeltaRotation.Roll = CurrentRollSpeed * DeltaSeconds;
 
 	// Rotate plane
@@ -66,9 +66,11 @@ void ALD38Pawn::NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other
 {
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
+	CurrentForwardSpeed = -CurrentForwardSpeed * 0.25f;
+
 	// Deflect along the surface when we collide.
-	FRotator CurrentRotation = GetActorRotation();
-	SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
+	//FRotator CurrentRotation = GetActorRotation();
+	//SetActorRotation(FQuat::Slerp(CurrentRotation.Quaternion(), HitNormal.ToOrientationQuat(), 0.025f));
 }
 
 
@@ -96,14 +98,16 @@ void ALD38Pawn::ThrustInput(float Val)
 
 void ALD38Pawn::MoveUpInput(float Val)
 {
-	// Target pitch speed is based in input
-	float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
+	ThrustInput(Val);
 
-	// When steering, we decrease pitch slightly
-	TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
+	//// Target pitch speed is based in input
+	//float TargetPitchSpeed = (Val * TurnSpeed * -1.f);
 
-	// Smoothly interpolate to target pitch speed
-	CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+	//// When steering, we decrease pitch slightly
+	//TargetPitchSpeed += (FMath::Abs(CurrentYawSpeed) * -0.2f);
+
+	//// Smoothly interpolate to target pitch speed
+	//CurrentPitchSpeed = FMath::FInterpTo(CurrentPitchSpeed, TargetPitchSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 }
 
 void ALD38Pawn::MoveRightInput(float Val)
