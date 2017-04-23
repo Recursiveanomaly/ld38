@@ -35,16 +35,29 @@ ALD38Pawn::ALD38Pawn()
 	Camera->bUsePawnControlRotation = false; // Don't rotate camera with controller
 
 	// Set handling parameters
-	Acceleration = 500.f;
+	Acceleration = 1000.f;
 	TurnSpeed = 50.f;
-	MaxSpeed = 4000.f;
+	MaxSpeed = 1000.f;
 	MinSpeed = -125.0f;
 	CurrentForwardSpeed = 500.f;
+
+	Gravity = -300.0f;
+	MaxUpSpeed = 750;
+	MinUpSpeed = -500;
 }
 
 void ALD38Pawn::Tick(float DeltaSeconds)
 {
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
+	CurrentUpSpeed += GetWorld()->GetDeltaSeconds() * Gravity;
+	CurrentUpSpeed = FMath::Clamp(CurrentUpSpeed, MinUpSpeed, MaxUpSpeed);
+
+	if (!HadInput)
+	{
+		CurrentForwardSpeed = CurrentForwardSpeed * 0.995f;
+	}
+	HadInput = false;
+
+	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, CurrentUpSpeed * DeltaSeconds);
 
 	// Move plan forwards (with sweep so we stop when we collide with things)
 	AddActorLocalOffset(LocalMove, true);
@@ -89,11 +102,19 @@ void ALD38Pawn::ThrustInput(float Val)
 	// Is there no input?
 	bool bHasInput = !FMath::IsNearlyEqual(Val, 0.f);
 	// If input is not held down, reduce speed
-	float CurrentAcc = bHasInput ? (Val * Acceleration) : (-0.5f * Acceleration);
+	float CurrentAcc = 0;
+	if (bHasInput)
+	{
+		CurrentAcc = Val * Acceleration;
+		HadInput = true;
+	}
+
 	// Calculate new speed
 	float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 	// Clamp between MinSpeed and MaxSpeed
 	CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+
+	CurrentUpSpeed += GetWorld()->GetDeltaSeconds() * CurrentAcc;
 }
 
 void ALD38Pawn::MoveUpInput(float Val)

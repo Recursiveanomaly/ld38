@@ -45,23 +45,34 @@ protected:
 private:
 
 	/** How quickly forward speed changes */
-	UPROPERTY(Category=Plane, EditAnywhere)
+	//UPROPERTY(Category=Plane, EditAnywhere)
 	float Acceleration;
 
 	/** How quickly pawn can steer */
-	UPROPERTY(Category=Plane, EditAnywhere)
+	//UPROPERTY(Category=Plane, EditAnywhere)
 	float TurnSpeed;
 
 	/** Max forward speed */
-	UPROPERTY(Category = Pitch, EditAnywhere)
+	//UPROPERTY(Category = Plane, EditAnywhere)
 	float MaxSpeed;
 
 	/** Min forward speed */
-	UPROPERTY(Category=Yaw, EditAnywhere)
+	//UPROPERTY(Category=Plane, EditAnywhere)
 	float MinSpeed;
+
+	//UPROPERTY(Category = Plane, EditAnywhere)
+	float Gravity;
 
 	/** Current forward speed */
 	float CurrentForwardSpeed;
+	bool HadInput;
+
+	float CurrentUpSpeed;
+
+	//UPROPERTY(Category = Plane, EditAnywhere)
+	float MaxUpSpeed;
+	//UPROPERTY(Category = Plane, EditAnywhere)
+	float MinUpSpeed;
 
 	/** Current yaw speed */
 	float CurrentYawSpeed;
